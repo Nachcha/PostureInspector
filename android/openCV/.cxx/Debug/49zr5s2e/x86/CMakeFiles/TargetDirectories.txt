@@ -1,0 +1,3 @@
+/Users/pasindu/Documents/Projects/FinalProject2022/MobileApp/PostureInspector/android/openCV/.cxx/Debug/49zr5s2e/x86/CMakeFiles/rebuild_cache.dir
+/Users/pasindu/Documents/Projects/FinalProject2022/MobileApp/PostureInspector/android/openCV/.cxx/Debug/49zr5s2e/x86/CMakeFiles/edit_cache.dir
+/Users/pasindu/Documents/Projects/FinalProject2022/MobileApp/PostureInspector/android/openCV/.cxx/Debug/49zr5s2e/x86/CMakeFiles/opencv_jni_shared.dir
