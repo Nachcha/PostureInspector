@@ -5,93 +5,90 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useEffect } from "react";
 import {
+  Button,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
   View,
-} from 'react-native';
+  NativeModules,
+  NativeEventEmitter,
+  requireNativeComponent,
+} from "react-native";
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import { Colors } from "react-native/Libraries/NewAppScreen";
+import MyView from "./src/components/native_components/my_view";
+// import RCTImageView from './src/components/native_modules/ImageView';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const { CalendarModule } = NativeModules;
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+const eventEmitter = new NativeEventEmitter(CalendarModule);
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const isDarkMode = useColorScheme() === "dark";
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    height: "100%",
+    paddingTop: 20,
+  };
+
+  useEffect(() => {
+    eventEmitter.addListener("EventCount", (eventCount) => {
+      console.log("New event count", eventCount);
+    });
+
+    return () => {
+      eventEmitter.removeAllListeners("EventCount");
+    };
+  }, []);
+
+  const handleIncrimentButton = () => {
+    // CalendarModule.createCalendarEvent("test Name", "test Location");
+    // CalendarModule.createCalendarEventCallBack((res: string) => {
+    //   console.log("Callback data from Native Method: ",res);
+    // });
+    createCalendarPromise();
+  };
+
+  const createCalendarPromise = async () => {
+    try {
+      const eventId = await CalendarModule.createCalendarPromise(
+        "Party",
+        "My House"
+      );
+      console.log(`Created a new event with id ${eventId}`);
+    } catch (e) {
+      console.error("native module promise error: ", e);
+    }
   };
 
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+      {/* <RCTHeatMap borderRadius={30} style={{width: '90%',height: 300, backgroundColor: 'red'}}/> */}
+      <View
+        style={{
+          display: "flex",
+          borderWidth: 2,
+          width: "100%",
+          maxHeight: "40%",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <MyView />
+      </View>
+      <Text style={{ fontSize: 20 }}>App Testing</Text>
+      <Button title="Increment" onPress={handleIncrimentButton} />
     </SafeAreaView>
   );
 }
@@ -103,15 +100,15 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   sectionDescription: {
     marginTop: 8,
     fontSize: 18,
-    fontWeight: '400',
+    fontWeight: "400",
   },
   highlight: {
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });
 
